@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { getPackagesIndex } from "../services/packages";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,6 +8,19 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
-  return <Welcome />;
+export async function loader() {
+  const packages = await getPackagesIndex();
+  return { packages };
+}
+
+export default function Home({
+  loaderData: { packages },
+}: Route.ComponentProps) {
+  return (
+    <ul>
+      {packages.packages.map((pkg) => (
+        <li key={pkg.id}>{pkg.title}</li>
+      ))}
+    </ul>
+  );
 }

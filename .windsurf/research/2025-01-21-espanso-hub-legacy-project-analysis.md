@@ -5,7 +5,16 @@ git_commit: 04545a51771d667e4828803994f68781ebb67752
 branch: main
 repository: hub-frontend-new
 topic: "Legacy Espanso Hub Project - Features and Data Flow Analysis"
-tags: [research, codebase, espanso-hub, legacy-analysis, data-flow, features, architecture]
+tags:
+  [
+    research,
+    codebase,
+    espanso-hub,
+    legacy-analysis,
+    data-flow,
+    features,
+    architecture,
+  ]
 status: complete
 last_updated: 2025-01-21
 last_updated_by: Cascade AI
@@ -25,6 +34,9 @@ Analyze the legacy Espanso Hub project contained in the `/old` directory to docu
 
 ## Summary
 
+**IMPORTANT**: The old project relies on functional programming via
+`io-ts` and `fp-ts`. This is a legacy codebase and should not be used as a reference for new code. The new code must be written in a more common style.
+
 The **Espanso Hub** is a Next.js-based web application serving as a package repository and discovery platform for [espanso](https://espanso.org/) - a text expansion tool. The application provides:
 
 1. **Package Discovery & Search** - Browse and search espanso packages with fuzzy text search and tag-based filtering
@@ -40,6 +52,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ### Core Features
 
 #### 1. **Landing Page** (`old/pages/index.tsx`)
+
 - **Hero Section**: Full-height landing with background image and prominent search
 - **Search Integration**: Quick search that redirects to `/search` with query parameters
 - **Featured Packages Section**: Displays curated packages in responsive grid layout
@@ -50,6 +63,7 @@ The application follows a **read-only, statically-generated architecture** with 
 - **SEO Metadata**: Comprehensive meta tags for title, description, and OpenGraph
 
 #### 2. **Search & Exploration Page** (`old/pages/search.tsx`)
+
 - **Search Capabilities**:
   - **Text Search**: Fuzzy search using Fuse.js across package name, author, description, and title
   - **Tag Filtering**: Multi-select tag filter with package counts per tag
@@ -66,6 +80,7 @@ The application follows a **read-only, statically-generated architecture** with 
 - **Navigation**: Tag badges clickable to filter by specific tag
 
 #### 3. **Package Detail Pages** (`old/pages/[packageName]/v/[version].tsx`)
+
 - **Two-Level Routing**:
   - `/[packageName]` - Latest version of package
   - `/[packageName]/v/[version]` - Specific version
@@ -90,9 +105,11 @@ The application follows a **read-only, statically-generated architecture** with 
   - Asset URL resolution for GitHub repositories
 
 #### 4. **404 Page** (`old/pages/404.tsx`)
+
 - Custom error page with navigation back to hub
 
 #### 5. **Featured Package System** (`old/api/packageFeatured.ts`)
+
 - Hardcoded list of featured packages:
   - all-emojis
   - html-utils-package
@@ -110,6 +127,7 @@ The application follows a **read-only, statically-generated architecture** with 
 #### Core Entities
 
 **Package**:
+
 ```typescript
 {
   id: string,              // Generated as `${name}-${version}`
@@ -125,6 +143,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ```
 
 **PackagesIndex**:
+
 ```typescript
 {
   last_update: number,     // Unix timestamp
@@ -133,6 +152,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ```
 
 **PackageManifest** (from `_manifest.yml` in package archive):
+
 ```typescript
 {
   author: string,
@@ -146,6 +166,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ```
 
 **PackageRepo** (complete package data):
+
 ```typescript
 {
   package: Package,
@@ -158,6 +179,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ```
 
 #### Type System Features
+
 - **io-ts runtime validation**: All external data validated at runtime
 - **Branded types**: PackageVersion, TextSearch, GithubURL with compile-time safety
 - **fp-ts functional patterns**: Option, Either, NonEmptyArray for type-safe null handling
@@ -169,6 +191,7 @@ The application follows a **read-only, statically-generated architecture** with 
 #### Build-Time Data Pipeline
 
 1. **Package Index Fetching** (`old/api/packagesIndex.ts`):
+
    ```
    Environment Variable (PACKAGE_INDEX_URL)
    ↓
@@ -184,6 +207,7 @@ The application follows a **read-only, statically-generated architecture** with 
    ```
 
 2. **Package Detail Fetching** (`old/api/packageRepo.ts`):
+
    ```
    Package.archive_url
    ↓
@@ -208,17 +232,18 @@ The application follows a **read-only, statically-generated architecture** with 
    ```
 
 3. **Static Site Generation**:
+
    ```
    getStaticPaths:
      - Generate paths for all packages
      - Generate paths for all package versions
-   
+
    getStaticProps:
      - Fetch PackagesIndex
      - Group packages by name, sort by version
      - For detail pages: fetch and process PackageRepo
      - Serialize README markdown
-   
+
    Build Output:
      - Static HTML pages for each route
      - Client-side hydration with React
@@ -227,6 +252,7 @@ The application follows a **read-only, statically-generated architecture** with 
 #### Runtime Data Flow (Client-Side)
 
 1. **Search Flow**:
+
    ```
    User Input (SearchBar)
    ↓
@@ -242,6 +268,7 @@ The application follows a **read-only, statically-generated architecture** with 
    ```
 
 2. **Navigation Flow**:
+
    ```
    Package Card Click → /[packageName]
    Tag Click → /search?t=[tag]
@@ -265,6 +292,7 @@ The application follows a **read-only, statically-generated architecture** with 
 ### Technical Architecture
 
 #### Framework & Libraries
+
 - **Next.js 12** (Pages Router, not App Router)
 - **React 17**
 - **TypeScript** with strict typing
@@ -276,12 +304,14 @@ The application follows a **read-only, statically-generated architecture** with 
 - **unzipit** (client-side ZIP extraction)
 
 #### State Management
+
 - **No global state management**: Uses Next.js router for URL-based state
 - **usePackageSearch hook**: Manages search query and tag state via URL params
 - **Local component state**: React.useState for UI interactions (side sheets, tabs)
 - **Static props**: All data pre-fetched at build time
 
 #### Styling Approach
+
 - **evergreen-ui theming**: Custom EspansoThemeProvider with color overrides
 - **Global CSS**: reset.css and index.css for base styles
 - **Component props**: Inline styling via evergreen-ui component props (flex, spacing, colors)
@@ -289,12 +319,14 @@ The application follows a **read-only, statically-generated architecture** with 
 - **No CSS modules or styled-components**
 
 #### Caching Strategy
+
 - **Build-time cache**: flat-cache for PackagesIndex (`.cache` directory)
 - **Browser cache**: Static assets (HTML, JS, CSS)
 - **No runtime cache**: All data baked into static pages
 - **Cache invalidation**: Only on rebuild/redeploy
 
 #### Performance Optimizations
+
 - **Static generation**: All pages pre-rendered at build time
 - **Incremental code display**: Large YAML files loaded 100 lines at a time
 - **Lazy markdown**: README serialized server-side but rendered client-side
@@ -304,12 +336,14 @@ The application follows a **read-only, statically-generated architecture** with 
 ### Component Architecture
 
 #### Layout Components (`old/components/layout/`)
+
 - **ContentRow**: Horizontal content wrapper with background/elevation props
 - **Stack**: Flexbox layout with configurable direction and spacing units
 - **useResponsive**: Device detection (mobile/tablet/desktop) with fold pattern
 - **useTabs**: Tab management with topbar/sidebar variants
 
 #### UI Components
+
 - **Navbar**: Search bar + navigation, sticky header
 - **Footer**: Author attribution and links
 - **PackageCard**: Package preview with title, description, tags, featured badge
@@ -322,6 +356,7 @@ The application follows a **read-only, statically-generated architecture** with 
 - **BetaBanner**: Site-wide beta notice
 
 #### Reusable Patterns
+
 - **NextjsLink**: Wrapper for Next.js Link with evergreen-ui styling
 - **EmptyResultsIcon**: SVG icon for no results state
 - **FeaturedBadge**: Visual indicator for featured packages
@@ -329,27 +364,30 @@ The application follows a **read-only, statically-generated architecture** with 
 ### External Dependencies
 
 #### Data Sources
+
 - **PACKAGE_INDEX_URL**: Environment variable pointing to package index JSON
   - Default: `https://github.com/espanso/hub/releases/download/v1.0.0/package_index.json`
 - **Package archives**: Individual ZIP files from GitHub releases
 - **Package assets**: Images/files from GitHub repositories
 
 #### Third-Party Services
+
 - **GitHub**: Package hosting, asset serving, homepage links
 - **CDN/Hosting**: Static site deployment (netlify/vercel compatible)
 
 ### Build & Deployment
 
 #### Environment Configuration
+
 - **Development** (`.env.development`):
   - `NEXT_PUBLIC_BASE_PATH=` (empty, root path)
   - `PACKAGE_INDEX_CACHE_DIR=.cache`
-  
 - **Production** (`.env.production`):
   - `NEXT_PUBLIC_BASE_PATH=` (configurable for subdirectory hosting)
   - `PACKAGE_INDEX_CACHE_DIR=.cache`
 
 #### Build Process
+
 ```bash
 # Clean cache
 yarn clean-cache
@@ -364,12 +402,14 @@ yarn export       # → next export (static export)
 ```
 
 #### Static Generation Requirements
+
 - All routes must be determinable at build time (getStaticPaths)
 - Package index must be accessible during build
 - Package archives must be downloadable during build
 - No dynamic routes beyond predefined package names/versions
 
 ### Testing Infrastructure (`old/test/`)
+
 - **Jest** test framework
 - **ts-jest** for TypeScript support
 - **jest-environment-jsdom** for DOM testing
@@ -392,6 +432,7 @@ All routes are static paths generated at build time from the package index.
 ### Feature Summary Checklist
 
 **Core Functionality**:
+
 - ✅ Package browsing and discovery
 - ✅ Text-based fuzzy search
 - ✅ Tag-based filtering
@@ -404,6 +445,7 @@ All routes are static paths generated at build time from the package index.
 - ✅ Responsive design (mobile/tablet/desktop)
 
 **User Interactions**:
+
 - ✅ Search input with URL state
 - ✅ Tag selection/removal
 - ✅ Version switching
@@ -413,6 +455,7 @@ All routes are static paths generated at build time from the package index.
 - ✅ Tag click to filter
 
 **Content Types**:
+
 - ✅ Package metadata (title, description, author, version, tags)
 - ✅ Markdown documentation (with GitHub-flavored syntax)
 - ✅ YAML configuration files
@@ -421,6 +464,7 @@ All routes are static paths generated at build time from the package index.
 - ✅ GitHub repository links
 
 **Technical Capabilities**:
+
 - ✅ Static site generation
 - ✅ SEO optimization (meta tags, sitemap)
 - ✅ Runtime type validation
@@ -434,6 +478,7 @@ All routes are static paths generated at build time from the package index.
 ## Code References
 
 ### Key Files for Understanding Data Flow
+
 - `old/api/packagesIndex.ts:31-43` - Package index fetching and caching
 - `old/api/packageRepo.ts:33-128` - Package archive fetching and parsing
 - `old/api/domain.ts:54-63` - Package type with ID generation
@@ -441,12 +486,14 @@ All routes are static paths generated at build time from the package index.
 - `old/api/package.ts:26-96` - Package resolution with version handling
 
 ### Key Pages and Features
+
 - `old/pages/index.tsx:66-177` - Landing page with hero and featured sections
 - `old/pages/search.tsx:54-340` - Search page with filtering UI
 - `old/pages/[packageName]/v/[version].tsx:156-483` - Package detail page
 - `old/components/featured/FeaturedShowcase.tsx:17-100` - Featured packages grid
 
 ### Configuration and Setup
+
 - `old/package.json:8-33` - Dependencies and versions
 - `old/package.json:35-45` - Build scripts and commands
 - `old/next.config.js:1-7` - Next.js configuration
@@ -455,6 +502,7 @@ All routes are static paths generated at build time from the package index.
 ## Architecture Insights
 
 ### Design Patterns
+
 1. **Static-First Architecture**: All content pre-generated, no server-side logic beyond build
 2. **Functional Programming**: Heavy use of fp-ts for type-safe transformations and error handling
 3. **Runtime Validation**: io-ts codecs ensure external data integrity
@@ -463,6 +511,7 @@ All routes are static paths generated at build time from the package index.
 6. **Progressive Enhancement**: Works without JavaScript for initial load (static HTML)
 
 ### Data Integrity Strategies
+
 1. **Branded Types**: Prevent invalid data at compile time (version format, URLs)
 2. **Runtime Decoders**: Validate all fetched data against expected schemas
 3. **Graceful Degradation**: Invalid packages logged but don't crash app
@@ -470,12 +519,14 @@ All routes are static paths generated at build time from the package index.
 5. **Option/Either Types**: Explicit null/error handling without exceptions
 
 ### Scalability Considerations
+
 1. **Build Time Scaling**: Build duration increases with package count (all pages pre-generated)
 2. **Bundle Size**: All packages metadata included in client bundle (via getStaticProps)
 3. **Search Performance**: Client-side search scales linearly with package count
 4. **Cache Strategy**: Single cache key for entire package index (no partial updates)
 
 ### UI/UX Patterns
+
 1. **Mobile-First Responsive**: Layout adapts with useResponsive hook
 2. **Progressive Disclosure**: Tabs separate description from source code
 3. **Incremental Loading**: Large files loaded in chunks (100 lines)
@@ -497,6 +548,7 @@ All routes are static paths generated at build time from the package index.
 ## Recommendations for Rewrite
 
 ### Must Preserve
+
 1. All routing patterns and URL structures (for SEO and existing links)
 2. Package index fetching and caching mechanism
 3. Static site generation capability
@@ -508,6 +560,7 @@ All routes are static paths generated at build time from the package index.
 9. YAML source code viewing
 
 ### Consider Modernizing
+
 1. **Next.js 15+ with App Router**: React Server Components for better performance
 2. **Replace fp-ts**: Consider more idiomatic TypeScript patterns for maintainability
 3. **Modern UI Library**: Replace evergreen-ui with shadcn/ui or similar modern components
@@ -520,6 +573,7 @@ All routes are static paths generated at build time from the package index.
 10. **Accessibility**: WCAG 2.1 AA compliance audit
 
 ### Potential New Features
+
 1. **Package Installation Analytics**: Track popular packages
 2. **User Ratings/Reviews**: Community feedback on packages
 3. **Advanced Filters**: Sort by date, popularity, version count
@@ -530,6 +584,7 @@ All routes are static paths generated at build time from the package index.
 8. **Localization**: Multi-language support
 
 ## Related Research
+
 - No prior research documents found in `.windsurf/research/`
 
 ---

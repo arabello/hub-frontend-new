@@ -1,5 +1,5 @@
 ---
-description: 
+description:
 auto_execution_mode: 1
 ---
 
@@ -16,6 +16,7 @@ Please provide your research question or area of interest, and I'll analyze it t
 ### 1. Read Mentioned Files First
 
 If you mention specific files (tasks, docs, JSON):
+
 - Read them FULLY first (entire files, no partial reads)
 - Read them in the main context before any other analysis
 - This ensures full context before proceeding
@@ -30,6 +31,7 @@ If you mention specific files (tasks, docs, JSON):
 ### 3. Research the Codebase
 
 Explore different aspects of the codebase:
+
 - Find what files and components exist
 - Understand how implementations work
 - Find similar features to reference
@@ -39,6 +41,7 @@ Explore different aspects of the codebase:
 ### 4. Synthesize Findings
 
 After research completes:
+
 - Compile all results (both codebase and .thoughts findings)
 - Prioritize live codebase findings as primary source of truth
 - Use .thoughts/ findings as supplementary historical context
@@ -76,43 +79,54 @@ last_updated_by: [Researcher name]
 **Repository**: [Repository name]
 
 ## Research Question
+
 [Original query]
 
 ## Summary
+
 [High-level findings answering your question]
 
 ## Detailed Findings
 
 ### [Component/Area 1]
+
 - Finding with reference (`file.ext:line`)
 - Connection to other components
 - Implementation details
 
 ### [Component/Area 2]
+
 ...
 
 ## Code References
+
 - `path/to/file.py:123` - Description of what's there
 - `another/file.ts:45-67` - Description of the code block
 
 ## Architecture Insights
+
 [Patterns, conventions, and design decisions discovered]
 
 ## Historical Context (from .thoughts/)
+
 [Relevant insights from .thoughts/ directory with references]
+
 - `.windsurf/something.md` - Historical decision about X
 - `.windsurf/local/notes.md` - Past exploration of Y
 
 ## Related Research
+
 [Links to other research documents in .windsurf/research/]
 
 ## Open Questions
+
 [Any areas that need further investigation]
 ```
 
 ### 6. Present Findings
 
 Present a concise summary of findings including:
+
 - Key discoveries
 - File references for easy navigation
 - Ask if there are follow-up questions or need clarification
@@ -120,6 +134,7 @@ Present a concise summary of findings including:
 ### 7. Handle Follow-up Questions
 
 If there are follow-up questions:
+
 - Append to the same research document
 - Update the frontmatter fields `last_updated` and `last_updated_by`
 - Add `last_updated_note: "Added follow-up research for [brief description]"`
