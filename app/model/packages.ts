@@ -40,3 +40,19 @@ export const PackagesIndexSchema = v.object({
 });
 
 export type PackagesIndex = v.InferOutput<typeof PackagesIndexSchema>;
+
+export const featuredPackages: string[] = [
+  "all-emojis",
+  "html-utils-package",
+  "lorem",
+  "spanish-accent",
+  "greek-letters-improved",
+  "math-symbols",
+  "medical-docs",
+  "shruggie",
+  "espanso-dice",
+];
+
+export function isFeatured(p: Package): boolean {
+  return featuredPackages.includes(p.name);
+}

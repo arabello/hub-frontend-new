@@ -2,7 +2,26 @@ import type { Route } from "./+types/search";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 import { getPackagesIndex } from "../services/packages";
-import { applyFilters, countTags } from "../services/search";
+import {
+  applyFilters,
+  countTags,
+  selectLatestPerName,
+} from "../services/search";
+import { Header } from "~/components/Header";
+import { PackageCard } from "~/components/PackageCard";
+import { CheckboxFilterGroup } from "~/components/CheckboxFilterGroup";
+import { RemovableBadge } from "~/components/RemovableBadge";
+import { EmptyState } from "~/components/EmptyState";
+import { Button } from "~/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
+import { Separator } from "~/components/ui/separator";
+import { SlidersHorizontal } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,14 +44,29 @@ export default function Search({
   // URL state for tag filtering (shareable)
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Parse tags from URL (?t=tag1,tag2)
-  const selectedTags = searchParams.get("t")?.split(",").filter(Boolean) || [];
+  // Parse tags from URL (?t=tag1,tag2) and normalize to lowercase unique set
+  const selectedTags = Array.from(
+    new Set(
+      searchParams
+        .get("t")
+        ?.split(",")
+        .filter(Boolean)
+        .map((t) => t.toLowerCase()) || [],
+    ),
+  );
 
-  // Apply filters
-  const filteredPackages = applyFilters(packages, textQuery, selectedTags);
+  // Consider only latest version per package name
+  const latestPackages = selectLatestPerName(packages);
 
-  // Get tag counts for filter UI
-  const tagCounts = countTags(packages);
+  // Apply filters to latest packages only
+  const filteredPackages = applyFilters(
+    latestPackages,
+    textQuery,
+    selectedTags,
+  );
+
+  // Get tag counts for filter UI from latest packages only
+  const tagCounts = countTags(latestPackages);
 
   // Handle tag toggle
   const toggleTag = (tag: string) => {
@@ -55,101 +89,126 @@ export default function Search({
 
   const hasActiveFilters = textQuery.trim() !== "" || selectedTags.length > 0;
 
+  // Prepare checkbox items for UI
+  const checkboxItems = tagCounts.map(({ tag, count }) => ({
+    tag,
+    count,
+    checked: selectedTags.includes(tag),
+  }));
+
   return (
-    <div>
-      <h1>Search Packages</h1>
+    <div className="min-h-screen flex flex-col">
+      <Header onSearchChange={setTextQuery} searchValue={textQuery} />
 
-      <div style={{ display: "flex", gap: "2rem" }}>
-        {/* Left Column - Tags */}
-        <aside style={{ minWidth: "200px" }}>
-          <h2>Filter by Tags</h2>
-          <fieldset>
-            <legend>Select tags to filter:</legend>
-            {tagCounts.slice(0, 10).map(({ tag, count }) => (
-              <div key={tag}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedTags.includes(tag)}
-                    onChange={() => toggleTag(tag)}
-                  />
-                  {tag} ({count})
-                </label>
+      <main className="flex-1 bg-muted/20">
+        <div className="content-row py-6">
+          <div className="flex gap-6">
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-20">
+                <CheckboxFilterGroup
+                  title="Tags"
+                  items={checkboxItems}
+                  onToggle={toggleTag}
+                  limit={15}
+                />
               </div>
-            ))}
-          </fieldset>
-        </aside>
+            </aside>
 
-        {/* Right Column - Search and Results */}
-        <main style={{ flex: 1 }}>
-          {/* Search Input Section */}
-          <section>
-            <h2>Text Search</h2>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="search-input">Search:</label>
-              <input
-                id="search-input"
-                type="text"
-                value={textQuery}
-                onChange={(e) => setTextQuery(e.target.value)}
-                placeholder="Search by name, author, description..."
-              />
-            </form>
-          </section>
-
-          {/* Active Filters Display */}
-          {hasActiveFilters && (
-            <section>
-              <h3>Active Filters:</h3>
-              <ul>
-                {textQuery.trim() !== "" && <li>Text: "{textQuery}"</li>}
-                {selectedTags.length > 0 && (
-                  <li>Tags: {selectedTags.join(", ")}</li>
-                )}
-              </ul>
-              <button type="button" onClick={clearAllFilters}>
-                Clear All Filters
-              </button>
-            </section>
-          )}
-
-          {/* Results Section */}
-          <section>
-            <h2>
-              Results ({filteredPackages.length} package
-              {filteredPackages.length !== 1 ? "s" : ""})
-            </h2>
-
-            {filteredPackages.length > 0 ? (
-              <ul>
-                {filteredPackages.map((pkg) => (
-                  <li key={pkg.id}>
-                    <h3>{pkg.title}</h3>
-                    <p>
-                      <strong>Description:</strong> {pkg.description}
-                    </p>
-                    <p>
-                      <strong>Author:</strong> {pkg.author}
-                    </p>
-                    <p>
-                      <strong>Version:</strong> {pkg.version}
-                    </p>
-                    <p>
-                      <strong>Tags:</strong> {pkg.tags.join(", ")}
-                    </p>
-                    <hr />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div>
-                <p>No packages found matching your criteria.</p>
-                <p>Try adjusting your search or clearing filters.</p>
+            {/* Main Content */}
+            <div className="flex-1 space-y-6">
+              {/* Mobile Filter Button */}
+              <div className="lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      <SlidersHorizontal className="mr-2 h-4 w-4" />
+                      Tags
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>Filter by Tags</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <CheckboxFilterGroup
+                        title=""
+                        items={checkboxItems}
+                        onToggle={toggleTag}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
-            )}
-          </section>
-        </main>
-      </div>
+
+              {/* Results Summary */}
+              {hasActiveFilters && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      {filteredPackages.length} result
+                      {filteredPackages.length !== 1 ? "s" : ""}
+                      {textQuery && (
+                        <span className="font-medium text-foreground">
+                          {" "}
+                          for "{textQuery}"
+                        </span>
+                      )}
+                    </p>
+                    <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+                      Clear all
+                    </Button>
+                  </div>
+
+                  {/* Active Tag Filters */}
+                  {selectedTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTags.map((tag) => (
+                        <RemovableBadge
+                          key={tag}
+                          onRemove={() => toggleTag(tag)}
+                        >
+                          {tag}
+                        </RemovableBadge>
+                      ))}
+                    </div>
+                  )}
+
+                  <Separator />
+                </div>
+              )}
+
+              {/* Results Grid */}
+              {filteredPackages.length > 0 ? (
+                <div className="grid gap-4 grid-cols-1">
+                  {filteredPackages.map((pkg) => (
+                    <PackageCard
+                      key={pkg.id}
+                      package={pkg}
+                      onTagClick={toggleTag}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No packages found"
+                  description="Can't find what you're looking for?"
+                  action={
+                    <a
+                      href="https://espanso.org/docs/next/packages/creating-a-package/"
+                      className="text-sm text-primary hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Create your own package
+                    </a>
+                  }
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

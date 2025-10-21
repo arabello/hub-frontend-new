@@ -92,3 +92,37 @@ export function applyFilters(
 
   return results;
 }
+
+/**
+ * Selects only the latest version for each package name.
+ * Uses numeric localeCompare on the validated semver-like version string.
+ */
+export function selectLatestPerName(packages: Package[]): Package[] {
+  const byName = new Map<string, Package>();
+
+  const toParts = (v: string): [number, number, number] => {
+    const [maj, min, pat] = v.split(".").map((n) => parseInt(n, 10));
+    return [maj || 0, min || 0, pat || 0];
+  };
+
+  const cmp = (a: string, b: string): number => {
+    const [amj, ami, ap] = toParts(a);
+    const [bmj, bmi, bp] = toParts(b);
+    if (amj !== bmj) return amj - bmj;
+    if (ami !== bmi) return ami - bmi;
+    return ap - bp;
+  };
+
+  for (const pkg of packages) {
+    const existing = byName.get(pkg.name);
+    if (!existing) {
+      byName.set(pkg.name, pkg);
+      continue;
+    }
+    if (cmp(pkg.version, existing.version) > 0) {
+      byName.set(pkg.name, pkg);
+    }
+  }
+
+  return Array.from(byName.values());
+}
