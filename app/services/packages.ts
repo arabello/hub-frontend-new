@@ -126,3 +126,37 @@ export async function getPackageByName(
 
   return sorted[0];
 }
+
+/**
+ * Gets a specific version of a package by name and version.
+ */
+export async function getPackageByNameAndVersion(
+  name: string,
+  version: string,
+): Promise<Package | null> {
+  const index = await getPackagesIndex();
+  return (
+    index.packages.find((p) => p.name === name && p.version === version) || null
+  );
+}
+
+/**
+ * Gets all versions for a specific package, sorted in descending order.
+ */
+export async function getVersionsForPackage(name: string): Promise<string[]> {
+  const index = await getPackagesIndex();
+  const versions = index.packages
+    .filter((p) => p.name === name)
+    .map((p) => p.version)
+    .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+  return Array.from(new Set(versions));
+}
+
+/**
+ * Gets all package version paths for prerendering.
+ * Returns paths in the format /:name/v/:version
+ */
+export async function getAllPackageVersionPaths(): Promise<string[]> {
+  const index = await getPackagesIndex();
+  return index.packages.map((p) => `/${p.name}/v/${p.version}`);
+}
