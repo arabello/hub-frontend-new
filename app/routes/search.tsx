@@ -100,7 +100,7 @@ export default function Search({
     <div className="min-h-screen flex flex-col">
       <Header onSearchChange={setTextQuery} searchValue={textQuery} />
 
-      <main className="flex-1 bg-muted/20">
+      <main className="flex-1 bg-white">
         <div className="content-row py-6">
           <div className="flex gap-6">
             {/* Desktop Sidebar */}
