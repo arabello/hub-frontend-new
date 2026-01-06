@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 interface HeaderProps {
   variant?: "default" | "landing";
   onSearchChange?: (value: string) => void;
+  onSearchSubmit?: (value: string) => void;
   searchValue?: string;
   showSearch?: boolean;
 }
@@ -15,6 +16,7 @@ interface HeaderProps {
 export function Header({
   variant = "default",
   onSearchChange,
+  onSearchSubmit,
   searchValue = "",
   showSearch = true,
 }: HeaderProps) {
@@ -50,6 +52,15 @@ export function Header({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   onSearchChange(e.target.value)
                 }
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (
+                    e.key === "Enter" &&
+                    onSearchSubmit &&
+                    searchValue.trim() !== ""
+                  ) {
+                    onSearchSubmit?.(searchValue);
+                  }
+                }}
                 className="pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
@@ -59,7 +70,7 @@ export function Header({
           <div className="flex-1" />
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="flex items-center gap-6">
             <a
               href="https://espanso.org/docs/get-started/"
               className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"

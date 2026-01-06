@@ -84,12 +84,28 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
   const [sharecopied, setShareCopied] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [copiedFileContent, setCopiedFileContent] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   // Initialize selected file from available files if not set and files are available
   useEffect(() => {
     if (selectedFile === "" && pkg.files && Object.keys(pkg.files).length > 0) {
-      // Select first file by default
-      setSelectedFile(Object.keys(pkg.files)[0]);
+      // Get all files excluding README.md and _manifest.yml
+      const availableFiles = Object.keys(pkg.files)
+        .filter(
+          (fileName) => !["README.md", "_manifest.yml"].includes(fileName),
+        )
+        .sort();
+
+      // Select first available file after exclusions
+      if (availableFiles.length > 0) {
+        setSelectedFile(availableFiles[0]);
+      } else if (Object.keys(pkg.files).includes("README.md")) {
+        // Fallback to README.md if no other files are available
+        setSelectedFile("README.md");
+      } else {
+        // Last resort: use the first file whatever it is
+        setSelectedFile(Object.keys(pkg.files)[0]);
+      }
     }
   }, [pkg.files, selectedFile]);
 
@@ -133,7 +149,13 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        onSearchSubmit={(searchValue) => {
+          navigate(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+        }}
+      />
 
       {/* Top Content */}
       <div className="bg-white py-8">
