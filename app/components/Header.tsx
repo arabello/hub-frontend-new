@@ -1,21 +1,29 @@
+import clsx from "clsx";
 import { Search } from "lucide-react";
 import type React from "react";
 import { Link } from "react-router";
 import { Input } from "~/components/ui/input";
 
 interface HeaderProps {
+  variant?: "default" | "landing";
   onSearchChange?: (value: string) => void;
   searchValue?: string;
   showSearch?: boolean;
 }
 
 export function Header({
+  variant = "default",
   onSearchChange,
   searchValue = "",
   showSearch = true,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-primary/30 bg-primary text-primary-foreground">
+    <header
+      className={clsx(
+        "sticky top-0 z-50 w-full border-b border-primary/30 border-none text-primary-foreground",
+        variant === "landing" ? "bg-transparent" : "bg-primary",
+      )}
+    >
       <div className="content-row">
         <div className="flex h-16 items-center gap-4">
           {/* Logo */}
@@ -29,7 +37,7 @@ export function Header({
           </Link>
 
           {/* Search Input - Desktop */}
-          {showSearch && (
+          {showSearch && onSearchChange && (
             <div className="hidden md:flex flex-1 max-w-md relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
@@ -37,7 +45,7 @@ export function Header({
                 placeholder="Search for packages"
                 value={searchValue}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  onSearchChange?.(e.target.value)
+                  onSearchChange(e.target.value)
                 }
                 className="pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground"
               />
