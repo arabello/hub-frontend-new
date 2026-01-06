@@ -18,6 +18,7 @@ export const RawPackageSchema = v.object({
   archive_url: v.string(),
   archive_sha256_url: v.string(),
   tags: v.array(v.string()),
+  files: v.optional(v.record(v.string(), v.string())),
 });
 
 export type RawPackage = v.InferOutput<typeof RawPackageSchema>;

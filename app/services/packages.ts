@@ -160,3 +160,58 @@ export async function getAllPackageVersionPaths(): Promise<string[]> {
   const index = await getPackagesIndex();
   return index.packages.map((p) => `/${p.name}/v/${p.version}`);
 }
+
+/**
+ * Fetches a package archive from its archive_url, unzips it and returns the file contents
+ * as a record of file paths to file contents.
+ * @param archiveUrl URL to the package archive zip file
+ * @returns Record of file paths to file contents
+ */
+export async function fetchPackageFiles(
+  archiveUrl: string,
+): Promise<Record<string, string>> {
+  try {
+    console.log(`🔍 Fetching package archive from: ${archiveUrl}`);
+    const response = await fetch(archiveUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch package archive from ${archiveUrl}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    // Get the zip file as an ArrayBuffer
+    const zipBuffer = await response.arrayBuffer();
+
+    // Use the JSZip library to extract the contents
+    const JSZip = (await import("jszip")).default;
+    const zip = new JSZip();
+    const zipContent = await zip.loadAsync(zipBuffer);
+
+    const files: Record<string, string> = {};
+
+    // Process all files in the zip archive
+    const filePromises = Object.keys(zipContent.files).map(async (filename) => {
+      const zipEntry = zipContent.files[filename];
+
+      // Skip directories
+      if (zipEntry.dir) return;
+
+      try {
+        // Read the file content as text
+        const content = await zipEntry.async("string");
+        files[filename] = content;
+      } catch (err) {
+        console.warn(`Failed to read file ${filename} from archive: ${err}`);
+      }
+    });
+
+    await Promise.all(filePromises);
+    console.log(`📂 Extracted ${Object.keys(files).length} files from archive`);
+
+    return files;
+  } catch (error) {
+    console.error("Error fetching package archive:", error);
+    return {};
+  }
+}
