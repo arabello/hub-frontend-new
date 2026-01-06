@@ -5,7 +5,9 @@ import { getPackagesIndex } from "../services/packages";
 import {
   applyFilters,
   countTags,
+  filterByTags,
   selectLatestPerName,
+  textSearch,
 } from "../services/search";
 import { Header } from "~/components/Header";
 import { PackageCard } from "~/components/PackageCard";
@@ -59,15 +61,21 @@ export default function Search({
   // Consider only latest version per package name
   const latestPackages = selectLatestPerName(packages);
 
-  // Apply filters to latest packages only
-  const filteredPackages = applyFilters(
-    latestPackages,
-    textQuery,
-    selectedTags,
-  );
+  // Apply text search first if there's a query
+  const textFilteredPackages =
+    textQuery.trim() !== ""
+      ? textSearch(latestPackages, textQuery)
+      : latestPackages;
 
-  // Get tag counts for filter UI from latest packages only
-  const tagCounts = countTags(latestPackages);
+  // Then apply tag filtering to get final filtered packages
+  const filteredPackages =
+    selectedTags.length > 0
+      ? filterByTags(textFilteredPackages, selectedTags)
+      : textFilteredPackages;
+
+  // Get tag counts for filter UI from text-filtered packages only
+  // This ensures tag counts reflect the current search term
+  const tagCounts = countTags(textFilteredPackages);
 
   // Handle tag toggle
   const toggleTag = (tag: string) => {
