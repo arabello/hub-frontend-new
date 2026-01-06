@@ -57,29 +57,27 @@ export function Footer({ showAuthor = false }: FooterProps) {
             <span className="sr-only">Espanso Hub</span>
           </Link>
 
-          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            {links.map((l) =>
-              l.external ? (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
-                >
-                  {l.label}
-                </a>
-              ) : (
-                <Link
-                  key={l.href}
-                  to={l.href}
-                  className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
-                >
-                  {l.label}
-                </Link>
-              ),
-            )}
-          </nav>
+          {links.map((l) =>
+            l.external ? (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link
+                key={l.href}
+                to={l.href}
+                className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
+              >
+                {l.label}
+              </Link>
+            ),
+          )}
         </div>
 
         {showAuthor && (

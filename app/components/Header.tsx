@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import type React from "react";
 import { Link } from "react-router";
 import { Input } from "~/components/ui/input";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
   variant?: "default" | "landing";
@@ -20,8 +21,10 @@ export function Header({
   return (
     <header
       className={clsx(
-        "sticky top-0 z-50 w-full border-b border-primary/30 border-none text-primary-foreground",
-        variant === "landing" ? "bg-transparent" : "bg-primary",
+        "w-full border-b border-primary/30 border-none text-primary-foreground",
+        variant === "landing"
+          ? "bg-transparent"
+          : "bg-primary sticky top-0 z-50",
       )}
     >
       <div className="content-row">
@@ -75,7 +78,7 @@ export function Header({
             </a>
             <Link
               to="/search"
-              className="text-sm font-medium text-primary-foreground hover:text-primary-foreground/80 transition-colors"
+              className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
             >
               Explore
             </Link>

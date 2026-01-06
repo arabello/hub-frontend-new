@@ -1,10 +1,13 @@
-import type { Route } from "./+types/home";
-import { getPackagesIndex } from "../services/packages";
-import { Header } from "../components/Header";
-import { ChevronDown, Search } from "lucide-react";
-import { Input } from "../components/ui/input";
+import { ChevronDown, Search, ShieldIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { Header } from "../components/Header";
+import { Input } from "../components/ui/input";
+import { getPackagesIndex } from "../services/packages";
+import type { Route } from "./+types/home";
+import { Badge } from "../components/ui/badge";
+import { isFeatured } from "../model/packages";
+import { PackageCard } from "../components/PackageCard";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,47 +30,81 @@ export default function Home({
   };
 
   return (
-    <div
-      style={{ backgroundImage: "url(images/landing_bg.svg)" }}
-      className="min-h-screen flex flex-col justify-between"
-    >
+    <div style={{ backgroundImage: "url(images/landing_bg.svg)" }}>
       {/* {packages.packages.map((pkg) => (
         <li key={pkg.id}>{pkg.title}</li>
       ))} */}
-      <div>
-        <Header variant="landing" />
+      <div className="min-h-screen flex flex-col justify-between">
+        <div>
+          <Header variant="landing" />
 
-        <div className="content-row mt-48 text-center justify-items-center">
-          <h1 className="text-4xl font-semibold text-white">
-            Enhance your workflows with espanso packages
-          </h1>
-          <h2 className="text-xl mt-5 text-white">
-            Emoji, code-snippets, mathematical notations, accents and more.
-          </h2>
-          <div className="flex min-w-1/3 relative mt-14">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="text"
-              placeholder="Already got an idea? Search it here..."
-              value={searchValue}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                onSearchChange(e.target.value)
-              }
-              className="pl-10 min-w-1/3 min-h-12 bg-background text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
+          <div className="content-row mt-48 text-center justify-items-center">
+            <h1 className="text-4xl font-semibold text-white">
+              Enhance your workflows with espanso packages
+            </h1>
+            <h2 className="text-xl mt-5 text-white">
+              Emoji, code-snippets, mathematical notations, accents and more.
+            </h2>
+            <div className="flex min-w-1/3 relative mt-14">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Already got an idea? Search it here..."
+                value={searchValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onSearchChange(e.target.value)
+                }
+                className="pl-10 min-w-1/3 min-h-12 bg-background text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
 
-          <div className="mt-14 text-white">
-            or{" "}
-            <Link to="/search" className="underline">
-              explore the hub
-            </Link>
+            <div className="mt-14 text-white">
+              or{" "}
+              <Link to="/search" className="underline">
+                explore the hub
+              </Link>
+            </div>
           </div>
+        </div>
+
+        <div className="self-center pb-10 ">
+          <ChevronDown className="text-white" />
         </div>
       </div>
 
-      <div className="self-center pb-10 ">
-        <ChevronDown className="text-white" />
+      {/* Featured Packages */}
+      <div className="bg-white py-16">
+        <div className="content-row flex flex-col gap-8">
+          <div className="flex items-center gap-8">
+            <h1 className="text-2xl font-semibold">Featured Packages</h1>
+            <Badge>
+              <ShieldIcon />
+              Featured
+            </Badge>
+          </div>
+
+          {/* Grid */}
+          <div className="flex flex-col md:grid md:grid-flow-col md:grid-rows-5 lg:grid-rows-3 gap-8">
+            {packages.packages
+              .filter(isFeatured)
+              .slice(0, 9)
+              .map((pkg) => (
+                <div key={pkg.id} className="w-96">
+                  <PackageCard
+                    package={pkg}
+                    showFeaturedBadge={false}
+                    onTagClick={() => {}}
+                  />
+                </div>
+              ))}
+          </div>
+
+          <div className="text-end">
+            <Link to="/search" className="hover:underline text-primary">
+              See all packages {">"}
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

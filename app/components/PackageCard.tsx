@@ -7,10 +7,15 @@ import { isFeatured } from "~/model/packages";
 
 interface PackageCardProps {
   package: Package;
+  showFeaturedBadge?: boolean;
   onTagClick: (tag: string) => void;
 }
 
-export function PackageCard({ package: pkg, onTagClick }: PackageCardProps) {
+export function PackageCard({
+  package: pkg,
+  showFeaturedBadge = true,
+  onTagClick,
+}: PackageCardProps) {
   const navigate = useNavigate();
   return (
     <Card
@@ -26,7 +31,7 @@ export function PackageCard({ package: pkg, onTagClick }: PackageCardProps) {
           <CardTitle className="text-base leading-tight">
             <div className="flex items-center gap-2">
               {pkg.title}
-              {isFeatured(pkg) && (
+              {isFeatured(pkg) && showFeaturedBadge && (
                 <Badge className="px-2 py-0.5 text-[10px]">Featured</Badge>
               )}
             </div>
