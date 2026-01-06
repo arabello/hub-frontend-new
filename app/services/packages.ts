@@ -162,6 +162,33 @@ export async function getAllPackageVersionPaths(): Promise<string[]> {
 }
 
 /**
+ * Parse the _manifest.yml file content to extract repository home URL
+ * @param manifestContent Content of the _manifest.yml file
+ * @returns Repository home URL or null if not found
+ */
+export function parseManifest(manifestContent: string): string | null {
+  try {
+    // Simple parsing of YAML to extract repository_url
+    const lines = manifestContent.split("\n");
+    for (const line of lines) {
+      if (line.trim().startsWith("homepage:")) {
+        const parts = line.split(":");
+        if (parts.length >= 2) {
+          const url = parts.slice(1).join(":").trim();
+          if (url.startsWith('"') && url.endsWith('"')) {
+            return url.slice(1, -1);
+          }
+        }
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error("Error parsing manifest:", error);
+    return null;
+  }
+}
+
+/**
  * Fetches a package archive from its archive_url, unzips it and returns the file contents
  * as a record of file paths to file contents.
  * @param archiveUrl URL to the package archive zip file

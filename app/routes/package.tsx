@@ -14,7 +14,7 @@ import {
   SelectTrigger,
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
-import { isFeatured } from "~/model/packages";
+import { isFeatured, type Package } from "~/model/packages";
 import { Header } from "../components/Header";
 import {
   Tabs,
@@ -27,6 +27,7 @@ import {
   getPackageByName,
   getPackageByNameAndVersion,
   getVersionsForPackage,
+  parseManifest,
 } from "../services/packages";
 import type { Route } from "./+types/package";
 
@@ -52,10 +53,16 @@ export async function loader({ params }: Route.LoaderArgs) {
       // Fetch the package archive files
       const files = await fetchPackageFiles(p.archive_url);
 
-      // Add files to the package object
+      // Extract repository home URL from _manifest.yml if available
+      const repositoryHome = files["_manifest.yml"]
+        ? parseManifest(files["_manifest.yml"])
+        : null;
+
+      // Add files and repositoryHome to the package object
       const packageWithFiles = {
         ...p,
         files,
+        repositoryHome: repositoryHome || undefined,
       };
 
       return { package: packageWithFiles, versions, isLatest };
@@ -108,14 +115,6 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
       }
     }
   }, [pkg.files, selectedFile]);
-
-  // Derive GitHub URL from archive_url
-  const getGitHubUrl = (archiveUrl: string): string | null => {
-    const match = archiveUrl.match(/github\.com\/([^\/]+\/[^\/]+)/);
-    return match ? `https://github.com/${match[1]}` : null;
-  };
-
-  const githubUrl = getGitHubUrl(pkg.archive_url);
 
   const installCommand = isLatest
     ? `espanso install ${pkg.name}`
@@ -184,10 +183,10 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
                   )}
                 </Button>
 
-                {githubUrl && (
+                {pkg.repositoryHome && (
                   <Button variant="ghost" size="icon" asChild>
                     <a
-                      href={githubUrl}
+                      href={pkg.repositoryHome}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="View on GitHub"
