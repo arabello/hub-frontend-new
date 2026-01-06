@@ -23,7 +23,7 @@ export function CheckboxFilterGroup({
   return (
     <div className="space-y-3">
       <h3 className="font-semibold text-sm">{title}</h3>
-      <div className="space-y-2">
+      <div className="space-y-2 ps-5 md:ps-0">
         {displayedItems.map(({ tag, count, checked }) => (
           <div key={tag} className="flex items-center space-x-2">
             <Checkbox

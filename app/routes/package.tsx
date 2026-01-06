@@ -163,9 +163,9 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
           {/* Package Header */}
           <div className="space-y-4">
             {/* Title and Featured Badge */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-8">
-                <h1 className="text-4xl md:text-5xl font-bold">{pkg.title}</h1>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+              <div className="flex items-center gap-2 md:gap-8">
+                <h1 className="text-3xl md:text-5xl font-bold">{pkg.title}</h1>
                 {isFeatured(pkg) && (
                   <Badge>
                     <ShieldIcon />
@@ -174,7 +174,7 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 self-start md:self-auto">
                 {/* Actions Row */}
                 <Button variant="ghost" size="icon" onClick={handleShare}>
                   {sharecopied ? (
@@ -199,7 +199,9 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
 
                 {/* Version Selector */}
                 <Select value={pkg.version} onValueChange={handleVersionChange}>
-                  <SelectTrigger>Select version</SelectTrigger>
+                  <SelectTrigger className="w-[130px] md:w-auto">
+                    Select version
+                  </SelectTrigger>
                   <SelectContent>
                     {versions.map((version) => (
                       <SelectItem key={version} value={version}>
@@ -211,8 +213,8 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
 
-            <div className="flex flex-row items-end">
-              <div className="flex flex-2 flex-col gap-5">
+            <div className="flex flex-col md:flex-row md:items-end gap-6 mt-4">
+              <div className="flex flex-1 flex-col gap-4 md:gap-5">
                 {/* Package Name */}
                 <p className="font-mono text-sm text-muted-foreground">
                   {pkg.name}
@@ -242,7 +244,7 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
               </div>
 
               {/* Install Box */}
-              <div className="flex flex-1 flex-col gap-5">
+              <div className="flex md:w-1/3 flex-col gap-3 md:gap-5 mt-2 md:mt-0">
                 <div className="bg-muted p-3 rounded-md font-mono text-sm break-all">
                   {installCommand}
                 </div>

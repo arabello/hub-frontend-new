@@ -43,7 +43,7 @@ export function Header({
 
           {/* Search Input - Desktop */}
           {showSearch && onSearchChange && (
-            <div className="hidden md:flex flex-1 max-w-md relative">
+            <div className="flex-1 max-w-md relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="text"
@@ -67,10 +67,10 @@ export function Header({
           )}
 
           {/* Spacer */}
-          <div className="flex-1" />
+          <div className="hidden md:flex flex-1" />
 
           {/* Navigation Links */}
-          <nav className="flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6">
             <a
               href="https://espanso.org/docs/get-started/"
               className="text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors"
