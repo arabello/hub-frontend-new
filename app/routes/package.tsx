@@ -1,4 +1,4 @@
-import { Check, Copy, Github, Share2 } from "lucide-react";
+import { Check, Copy, Github, Share2, ShieldIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { useNavigate } from "react-router";
@@ -142,10 +142,11 @@ export default function PackageRoute({ loaderData }: Route.ComponentProps) {
           <div className="space-y-4">
             {/* Title and Featured Badge */}
             <div className="flex justify-between items-center">
-              <div className="flex">
+              <div className="flex items-center gap-8">
                 <h1 className="text-4xl md:text-5xl font-bold">{pkg.title}</h1>
                 {isFeatured(pkg) && (
-                  <Badge variant="default" className="mt-2">
+                  <Badge>
+                    <ShieldIcon />
                     Featured
                   </Badge>
                 )}
