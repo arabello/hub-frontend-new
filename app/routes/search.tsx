@@ -38,11 +38,12 @@ export async function loader() {
 export default function Search({
   loaderData: { packages },
 }: Route.ComponentProps) {
-  // Local state for text search (instant filtering, no URL)
-  const [textQuery, setTextQuery] = useState("");
-
-  // URL state for tag filtering (shareable)
+  // URL state for tag filtering (shareable) and query parameter
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize text query from URL parameter 'q' if available
+  const queryParam = searchParams.get("q") || "";
+  const [textQuery, setTextQuery] = useState(queryParam);
 
   // Parse tags from URL (?t=tag1,tag2) and normalize to lowercase unique set
   const selectedTags = Array.from(
@@ -87,6 +88,27 @@ export default function Search({
     setSearchParams({});
   };
 
+  // Update URL when text query changes
+  const handleSearchChange = (value: string) => {
+    setTextQuery(value);
+
+    // Update URL params with new query value if not empty
+    if (value.trim() !== "") {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set("q", value.trim());
+        return newParams;
+      });
+    } else if (searchParams.has("q")) {
+      // Remove q parameter if query is empty
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.delete("q");
+        return newParams;
+      });
+    }
+  };
+
   const hasActiveFilters = textQuery.trim() !== "" || selectedTags.length > 0;
 
   // Prepare checkbox items for UI
@@ -98,7 +120,7 @@ export default function Search({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header onSearchChange={setTextQuery} searchValue={textQuery} />
+      <Header onSearchChange={handleSearchChange} searchValue={textQuery} />
 
       <main className="flex-1 bg-white">
         <div className="content-row py-6">

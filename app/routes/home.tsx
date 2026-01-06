@@ -1,6 +1,6 @@
 import { ChevronDown, Search, ShieldIcon } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Header } from "../components/Header";
 import { Input } from "../components/ui/input";
 import { getPackagesIndex } from "../services/packages";
@@ -25,8 +25,16 @@ export default function Home({
   loaderData: { packages },
 }: Route.ComponentProps) {
   const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+
   const onSearchChange = (value: string) => {
     setSearchValue(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchValue.trim() !== "") {
+      navigate(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+    }
   };
 
   return (
@@ -54,6 +62,7 @@ export default function Home({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   onSearchChange(e.target.value)
                 }
+                onKeyDown={handleKeyDown}
                 className="pl-10 min-w-1/3 min-h-12 bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
