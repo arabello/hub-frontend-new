@@ -5,14 +5,15 @@ import {
 } from "./app/services/packages";
 
 export default {
-  // return a list of URLs to prerender at build time
+  basename: import.meta.env.PROD ? "/hub-frontend-new" : "/",
+  ssr: false,
   async prerender() {
     const packageNames = await getUniquePackageNames();
     const versionPaths = await getAllPackageVersionPaths();
 
-    // Generate paths for home, all packages (latest), and all versioned packages
     const paths = [
       "/",
+      "/search",
       ...packageNames.map((name) => `/${name}`),
       ...versionPaths,
     ];
