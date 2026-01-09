@@ -1,5 +1,6 @@
 {
   "name": "hub-frontend-new",
+  "homepage": "https://matteopellegrino.dev/hub-frontend-new",
   "private": true,
   "type": "module",
   "scripts": {
