@@ -5,7 +5,7 @@ import {
 } from "./app/services/packages";
 
 export default {
-  basename: import.meta.env.PROD ? "/hub-frontend-new" : "/",
+  basename: import.meta.env.PROD ? "/hub-frontend-new/" : "/",
   ssr: false,
   async prerender() {
     const packageNames = await getUniquePackageNames();
@@ -14,8 +14,8 @@ export default {
     const paths = [
       "/",
       "/search",
-      ...packageNames.map((name) => `/${name}`),
-      ...versionPaths,
+      ...packageNames.slice(0, 3).map((name) => `/${name}`),
+      ...versionPaths.slice(0, 3),
     ];
 
     console.log(
